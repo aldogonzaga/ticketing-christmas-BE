@@ -49,11 +49,11 @@ return new class extends Migration
 
         Schema::create('settings', function (Blueprint $table) {
             $table->id();
-            $table->string('name')->default('Opening PPDB & SemiFinal Maheswara Maheswari 2027');
+            $table->string('name')->default('Christmas Celebration 2026');
             $table->string('school')->default('SMK Metland');
             $table->string('date')->nullable();
             $table->string('location')->nullable();
-            $table->text('tagline')->nullable()->default('Empowering Our Chapter Through Indonesian Culture');
+            $table->text('tagline')->nullable()->default('Celebrating Together in Joy and Unity');
             $table->string('contact')->nullable();
             $table->text('group_photo')->nullable();
             $table->timestamps();

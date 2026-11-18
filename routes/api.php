@@ -26,7 +26,7 @@ Route::get('/public/invitations/{code}', [PublicController::class, 'getInvitatio
 Route::post('/public/rsvp/{code}', [PublicController::class, 'submitRsvp']);
 Route::post('/public/schools/{code}/members', [PublicController::class, 'updateSchoolMembers']);
 
-// Messages (Ucapan & Doa)
+// Messages (Ucapan & Doa) — public read + write
 Route::get('/messages', [MessageController::class, 'index']);
 Route::post('/messages', [MessageController::class, 'store']);
 
@@ -51,21 +51,26 @@ Route::post('/activities', [ActivityController::class, 'store']);
 | Admin & Protected / Management Routes
 |--------------------------------------------------------------------------
 */
-// Management CRUD
-Route::post('/invitations', [InvitationController::class, 'store']);
-Route::put('/invitations/{id}', [InvitationController::class, 'update']);
-Route::delete('/invitations/{id}', [InvitationController::class, 'destroy']);
-Route::post('/invitations/import', [InvitationController::class, 'import']);
-
-Route::put('/settings', [SettingController::class, 'update']);
-Route::get('/reports/export', [StatsController::class, 'export']);
-Route::delete('/messages/{id}', [MessageController::class, 'destroy']);
-
-// Reset simulation data
-Route::post('/reset', [ResetController::class, 'reset']);
-
-// Sanctum protected routes
 Route::middleware('auth:sanctum')->group(function () {
+    // Auth - current user & logout
     Route::get('/me', [AuthController::class, 'me']);
     Route::post('/logout', [AuthController::class, 'logout']);
+
+    // Invitation management CRUD
+    Route::post('/invitations', [InvitationController::class, 'store']);
+    Route::put('/invitations/{id}', [InvitationController::class, 'update']);
+    Route::delete('/invitations/{id}', [InvitationController::class, 'destroy']);
+    Route::post('/invitations/import', [InvitationController::class, 'import']);
+
+    // Settings management
+    Route::put('/settings', [SettingController::class, 'update']);
+
+    // Reports
+    Route::get('/reports/export', [StatsController::class, 'export']);
+
+    // Message moderation
+    Route::delete('/messages/{id}', [MessageController::class, 'destroy']);
+
+    // Reset simulation data
+    Route::post('/reset', [ResetController::class, 'reset']);
 });

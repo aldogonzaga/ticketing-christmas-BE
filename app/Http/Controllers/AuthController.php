@@ -1,7 +1,5 @@
 <?php
 
-namespace App\Models; // for reference
-
 namespace App\Http\Controllers;
 
 use App\Models\User;

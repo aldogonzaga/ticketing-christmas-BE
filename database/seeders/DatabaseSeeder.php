@@ -28,11 +28,11 @@ class DatabaseSeeder extends Seeder
         Setting::updateOrCreate(
             ['id' => 1],
             [
-                'name' => 'Opening PPDB & SemiFinal Maheswara Maheswari 2027',
+                'name' => 'Christmas Celebration 2026',
                 'school' => 'SMK Metland',
                 'date' => '',
                 'location' => '',
-                'tagline' => 'Empowering Our Chapter Through Indonesian Culture',
+                'tagline' => 'Celebrating Together in Joy and Unity',
                 'contact' => '',
                 'group_photo' => '',
             ]
