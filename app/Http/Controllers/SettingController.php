@@ -15,10 +15,10 @@ class SettingController extends Controller
             ['id' => 1],
             [
                 'name' => 'Christmas Celebration 2026',
-                'school' => 'SMK Metland',
+                'school' => 'Panitia Natal 2026',
                 'date' => '',
                 'location' => '',
-                'tagline' => 'Celebrating Together in Joy and Unity',
+                'tagline' => 'Merajut Kasih, Berbagi Damai & Sukacita Natal',
                 'contact' => '',
                 'group_photo' => '',
             ]

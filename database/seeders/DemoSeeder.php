@@ -156,18 +156,18 @@ class DemoSeeder extends Seeder
         $messages = [
             [
                 'name' => 'Nabila Putri',
-                'text' => 'Semoga menjadi awal dari langkah besar dan prestasi yang membanggakan di Maheswara Maheswari 2027!',
-                'category' => 'Siswa',
+                'text' => 'Selamat merayakan Natal 2026! Kiranya damai, sukacita, dan kehangatan senantiasa beserta kita semua.',
+                'category' => 'Tamu Undangan',
             ],
             [
                 'name' => 'Ani Wulandari',
-                'text' => 'Bangga melihat semangat generasi muda dalam merawat budaya dan meraih prestasi.',
-                'category' => 'Guru / Pendamping',
+                'text' => 'Semoga perayaan Natal ini membawa berkat melimpah dan mempererat tali persaudaraan kita.',
+                'category' => 'Keluarga & Sahabat',
             ],
             [
                 'name' => 'Hendra Wijaya',
-                'text' => 'Bersama kita tumbuhkan generasi yang berkarakter, kreatif, dan cinta Indonesia.',
-                'category' => 'Tamu undangan',
+                'text' => 'Damai di bumi, damai di hati. Selamat Natal dan menyongsong Tahun Baru dengan sukacita!',
+                'category' => 'Tamu VIP',
             ],
         ];
 
