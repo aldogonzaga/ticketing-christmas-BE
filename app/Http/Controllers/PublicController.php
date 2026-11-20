@@ -148,6 +148,74 @@ class PublicController extends Controller
         ]);
     }
 
+    public function register(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'affiliation' => 'required|string|max:255',
+            'category' => 'nullable|string',
+            'message' => 'required|string|max:1000',
+            'phone' => 'nullable|string|max:50',
+        ]);
+
+        $category = $validated['category'] ?? 'Orang Tua/Wali';
+        $validCategories = ['SMP', 'Guru', 'VIP', 'Orang Tua/Wali'];
+        if (! in_array($category, $validCategories)) {
+            $affLower = strtolower($validated['affiliation']);
+            if (str_contains($affLower, 'smp') || str_contains($affLower, 'sekolah')) {
+                $category = 'SMP';
+            } elseif (str_contains($affLower, 'guru') || str_contains($affLower, 'pengajar')) {
+                $category = 'Guru';
+            } elseif (str_contains($affLower, 'vip') || str_contains($affLower, 'dinas') || str_contains($affLower, 'pejabat')) {
+                $category = 'VIP';
+            } else {
+                $category = 'Orang Tua/Wali';
+            }
+        }
+
+        // Generate unique 5-character alphanumeric code (excluding ambiguous 0, O, 1, I)
+        $characters = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+        do {
+            $code = '';
+            for ($i = 0; $i < 5; $i++) {
+                $code .= $characters[random_int(0, strlen($characters) - 1)];
+            }
+        } while (Invitation::where('code', $code)->exists());
+
+        $invitation = Invitation::create([
+            'id' => (string) Str::uuid(),
+            'code' => $code,
+            'name' => $validated['name'],
+            'category' => $category,
+            'institution' => $validated['affiliation'],
+            'phone' => $validated['phone'] ?? null,
+            'quota' => 1,
+            'checked' => 0,
+            'rsvp' => 'Hadir',
+            'note' => $validated['message'],
+        ]);
+
+        // Save Christmas message to messages table so it displays in celebration marquee
+        Message::create([
+            'name' => $validated['name'],
+            'text' => $validated['message'],
+            'category' => $validated['affiliation'],
+        ]);
+
+        // Log activity
+        Activity::create([
+            'text' => "{$invitation->name} ({$validated['affiliation']}) mendaftar tiket ({$code})",
+            'time' => now()->format('H:i'),
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Pendaftaran berhasil, kode unik tiket telah diterbitkan.',
+            'code' => $code,
+            'data' => $invitation->load('members'),
+        ], 201);
+    }
+
     public function getPublicData(): JsonResponse
     {
         $settings = Setting::first();

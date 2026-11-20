@@ -20,11 +20,14 @@ use Illuminate\Support\Facades\Route;
 // Auth
 Route::post('/login', [AuthController::class, 'login']);
 
-// Public event portal & ticket
+// Public event portal, ticket & registration
 Route::get('/public/data', [PublicController::class, 'getPublicData']);
+Route::post('/public/register', [PublicController::class, 'register']);
 Route::get('/public/invitations/{code}', [PublicController::class, 'getInvitation']);
 Route::post('/public/rsvp/{code}', [PublicController::class, 'submitRsvp']);
 Route::post('/public/schools/{code}/members', [PublicController::class, 'updateSchoolMembers']);
+Route::post('/public/check-in', [CheckInController::class, 'checkIn']);
+Route::post('/public/invitations/{code}/check-in', [CheckInController::class, 'checkIn']);
 
 // Messages (Ucapan & Doa) — public read + write
 Route::get('/messages', [MessageController::class, 'index']);

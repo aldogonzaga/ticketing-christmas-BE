@@ -7,6 +7,7 @@ use App\Models\Invitation;
 use App\Models\Member;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class CheckInController extends Controller
 {
@@ -46,9 +47,10 @@ class CheckInController extends Controller
             'member_ids' => 'nullable|array',
             'member_ids.*' => 'string',
             'count' => 'nullable|integer|min:1',
+            'attendees' => 'nullable', // array of names or comma/newline separated string
         ]);
 
-        $identifier = $validated['id'] ?? $validated['code'] ?? null;
+        $identifier = $validated['id'] ?? $validated['code'] ?? $request->route('code') ?? null;
 
         if (! $identifier) {
             return response()->json([
@@ -76,78 +78,58 @@ class CheckInController extends Controller
             ], 422);
         }
 
-        $memberIds = $validated['member_ids'] ?? [];
-        $remainingQuota = $invitation->quota - $invitation->checked;
-
-        if ($remainingQuota <= 0) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Kuota tiket sudah penuh / sudah check-in lengkap sebelumnya.',
-            ], 422);
+        // Process attendee names if provided
+        $attendeeNames = [];
+        if (! empty($validated['attendees'])) {
+            if (is_array($validated['attendees'])) {
+                $attendeeNames = array_filter(array_map('trim', $validated['attendees']));
+            } elseif (is_string($validated['attendees'])) {
+                $attendeeNames = array_filter(array_map('trim', preg_split('/[,\n\r]+/', $validated['attendees'])));
+            }
         }
 
-        if ($invitation->category === 'SMP') {
-            if (! empty($memberIds)) {
-                $unpresentMembers = $invitation->members
-                    ->whereIn('id', $memberIds)
-                    ->where('present', false);
-
-                $added = $unpresentMembers->count();
-
-                if ($added === 0) {
-                    return response()->json([
-                        'success' => false,
-                        'message' => 'Anggota yang dipilih sudah check-in sebelumnya.',
-                    ], 422);
-                }
-
-                Member::whereIn('id', $unpresentMembers->pluck('id'))
-                    ->update(['present' => true]);
-            } else {
-                // Check in all unpresent members if any; if no members registered, check in 1 representative
-                $unpresentCount = $invitation->members()->where('present', false)->count();
-
-                if ($unpresentCount > 0) {
-                    $invitation->members()->where('present', false)->update(['present' => true]);
-                    $added = min($unpresentCount, $remainingQuota);
+        // Save attendees as Member records
+        if (! empty($attendeeNames)) {
+            foreach ($attendeeNames as $attName) {
+                $existing = $invitation->members->firstWhere('name', $attName);
+                if ($existing) {
+                    $existing->update(['present' => true]);
                 } else {
-                    // Default to 1 attendee (ticket bearer/representative) if no specific count provided
-                    $added = min($validated['count'] ?? 1, $remainingQuota);
+                    Member::create([
+                        'id' => (string) Str::uuid(),
+                        'invitation_id' => $invitation->id,
+                        'name' => $attName,
+                        'role' => 'Tamu',
+                        'present' => true,
+                    ]);
                 }
             }
-
-            if ($invitation->checked + $added > $invitation->quota) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Jumlah hadir melebihi kuota.',
-                ], 422);
-            }
-
-            $invitation->checked += $added;
-            $invitation->save();
-        } else {
-            $added = min($validated['count'] ?? $remainingQuota, $remainingQuota);
-
-            if ($added <= 0) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Jumlah hadir tidak valid atau kuota sudah penuh.',
-                ], 422);
-            }
-
-            $invitation->checked += $added;
-            $invitation->save();
         }
+
+        // Handle specific member_ids if provided
+        $memberIds = $validated['member_ids'] ?? [];
+        if (! empty($memberIds)) {
+            Member::whereIn('id', $memberIds)->update(['present' => true]);
+        }
+
+        // Determine updated party count
+        $partyCount = $validated['count'] ?? (! empty($attendeeNames) ? count($attendeeNames) : ($invitation->checked > 0 ? $invitation->checked : 1));
+
+        // Update database: adjust quota to match party size if needed, update checked count
+        $invitation->quota = max($invitation->quota, $partyCount);
+        $invitation->checked = $partyCount;
+        $invitation->rsvp = 'Hadir';
+        $invitation->save();
 
         Activity::create([
-            'text' => "{$invitation->name} · {$added} peserta berhasil check-in",
+            'text' => "{$invitation->name} check-in ({$partyCount} tamu hadir)",
             'time' => now()->format('H:i'),
         ]);
 
         return response()->json([
             'success' => true,
-            'message' => "{$added} peserta berhasil check-in.",
-            'added' => $added,
+            'message' => "Kehadiran {$partyCount} tamu berhasil dicatat di database.",
+            'added' => $partyCount,
             'data' => $invitation->fresh('members'),
         ]);
     }
