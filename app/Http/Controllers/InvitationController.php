@@ -63,6 +63,7 @@ class InvitationController extends Controller
     {
         $invitation = Invitation::with('members')
             ->where('id', $id)
+            ->orWhere('code', strtoupper(trim($id)))
             ->orWhere('code', $id)
             ->first();
 

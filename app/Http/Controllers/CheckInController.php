@@ -13,8 +13,10 @@ class CheckInController extends Controller
 {
     public function verify(string $identifier): JsonResponse
     {
+        $normalized = strtoupper(trim($identifier));
         $invitation = Invitation::with('members')
-            ->where('code', $identifier)
+            ->where('code', $normalized)
+            ->orWhere('code', $identifier)
             ->orWhere('id', $identifier)
             ->first();
 
@@ -59,8 +61,10 @@ class CheckInController extends Controller
             ], 422);
         }
 
+        $normalized = strtoupper(trim($identifier));
         $invitation = Invitation::with('members')
             ->where('id', $identifier)
+            ->orWhere('code', $normalized)
             ->orWhere('code', $identifier)
             ->first();
 

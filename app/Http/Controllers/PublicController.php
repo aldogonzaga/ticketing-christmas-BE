@@ -15,8 +15,10 @@ class PublicController extends Controller
 {
     public function getInvitation(string $code): JsonResponse
     {
+        $normalized = strtoupper(trim($code));
         $invitation = Invitation::with('members')
-            ->where('code', $code)
+            ->where('code', $normalized)
+            ->orWhere('code', $code)
             ->first();
 
         if (! $invitation) {
@@ -34,7 +36,8 @@ class PublicController extends Controller
 
     public function submitRsvp(Request $request, string $code): JsonResponse
     {
-        $invitation = Invitation::where('code', $code)->first();
+        $normalized = strtoupper(trim($code));
+        $invitation = Invitation::where('code', $normalized)->orWhere('code', $code)->first();
 
         if (! $invitation) {
             return response()->json([
@@ -159,7 +162,7 @@ class PublicController extends Controller
         ]);
 
         $category = $validated['category'] ?? 'Orang Tua/Wali';
-        $validCategories = ['SMP', 'Guru', 'VIP', 'Orang Tua/Wali'];
+        $validCategories = ['SMP', 'Guru', 'VIP', 'Orang Tua/Wali', 'Umum'];
         if (! in_array($category, $validCategories)) {
             $affLower = strtolower($validated['affiliation']);
             if (str_contains($affLower, 'smp') || str_contains($affLower, 'sekolah')) {
