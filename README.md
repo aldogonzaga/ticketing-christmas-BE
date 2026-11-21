@@ -20,8 +20,8 @@ Backend RESTful API untuk sistem **Sambut GCP 2026** (Opening PPDB & SemiFinal M
    - Check-in presensi per anggota (SMP) atau akumulasi kuota (Guru, VIP, Orang Tua/Wali).
    - Validasi pembatalan dan pencegahan kehadiran melebihi kuota.
    - Otomatis mencatat riwayat aktivitas check-in.
-4. **Portal Publik & Golden Ticket**:
-   - Halaman tiket publik dan golden ticket berdasarkan kode unik (`GCP-SMP-XXXXX`).
+4. **Portal Publik & Ticket**:
+   - Halaman tiket publik dan ticket berdasarkan kode unik (`GCP-SMP-XXXXX`).
    - Konfirmasi kehadiran (RSVP: Hadir, Tidak Hadir, Pending) oleh tamu.
    - Portal mandiri perwakilan SMP untuk mengisi dan mengubah anggota siswa & guru pendamping.
 5. **Buku Tamu (Ucapan & Doa)**:
@@ -131,7 +131,7 @@ Semua rute API diawali dengan `/api`.
 | Method | Endpoint | Body | Deskripsi |
 |---|---|---|---|
 | `GET` | `/api/public/data` | - | Data publik (settings, pesan, aktivitas) |
-| `GET` | `/api/public/invitations/{code}` | - | Detail undangan untuk Golden Ticket |
+| `GET` | `/api/public/invitations/{code}` | - | Detail undangan untuk Ticket |
 | `POST` | `/api/public/rsvp/{code}` | `{ "rsvp": "Hadir", "phone": "0812..." }` | Konfirmasi kehadiran tamu |
 | `POST` | `/api/public/schools/{code}/members` | `{ "members": [...], "pic": "...", "phone": "..." }` | Input anggota mandiri sekolah SMP |
 
