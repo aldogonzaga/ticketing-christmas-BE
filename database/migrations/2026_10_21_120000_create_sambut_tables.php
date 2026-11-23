@@ -53,7 +53,7 @@ return new class extends Migration
             $table->string('school')->default('SMK Metland');
             $table->string('date')->nullable();
             $table->string('location')->nullable();
-            $table->text('tagline')->nullable()->default('Celebrating Together in Joy and Unity');
+            $table->string('tagline', 500)->nullable()->default('Celebrating Together in Joy and Unity');
             $table->string('contact')->nullable();
             $table->text('group_photo')->nullable();
             $table->timestamps();
