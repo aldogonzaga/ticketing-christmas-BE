@@ -48,7 +48,7 @@ class CheckInController extends Controller
             'code' => 'nullable|string',
             'member_ids' => 'nullable|array',
             'member_ids.*' => 'string',
-            'count' => 'nullable|integer|min:1',
+            'count' => 'nullable|integer|min:1|max:3',
             'attendees' => 'nullable', // array of names or comma/newline separated string
         ]);
 
