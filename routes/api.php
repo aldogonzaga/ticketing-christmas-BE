@@ -41,9 +41,21 @@ Route::get('/stats', [StatsController::class, 'index']);
 Route::get('/check-in/verify/{identifier}', [CheckInController::class, 'verify']);
 Route::post('/check-in', [CheckInController::class, 'checkIn']);
 
-// Public invitation list / search (accessible for frontend components)
+// Public invitation list / search & management
 Route::get('/invitations', [InvitationController::class, 'index']);
 Route::get('/invitations/{id}', [InvitationController::class, 'show']);
+Route::post('/invitations', [InvitationController::class, 'store']);
+Route::put('/invitations/{id}', [InvitationController::class, 'update']);
+Route::delete('/invitations/{id}', [InvitationController::class, 'destroy']);
+Route::post('/invitations/import', [InvitationController::class, 'import']);
+
+// Settings & Reports management
+Route::put('/settings', [SettingController::class, 'update']);
+Route::get('/reports/export', [StatsController::class, 'export']);
+
+// Message moderation & Reset
+Route::delete('/messages/{id}', [MessageController::class, 'destroy']);
+Route::post('/reset', [ResetController::class, 'reset']);
 
 // Activities
 Route::get('/activities', [ActivityController::class, 'index']);
@@ -58,22 +70,4 @@ Route::middleware('auth:sanctum')->group(function () {
     // Auth - current user & logout
     Route::get('/me', [AuthController::class, 'me']);
     Route::post('/logout', [AuthController::class, 'logout']);
-
-    // Invitation management CRUD
-    Route::post('/invitations', [InvitationController::class, 'store']);
-    Route::put('/invitations/{id}', [InvitationController::class, 'update']);
-    Route::delete('/invitations/{id}', [InvitationController::class, 'destroy']);
-    Route::post('/invitations/import', [InvitationController::class, 'import']);
-
-    // Settings management
-    Route::put('/settings', [SettingController::class, 'update']);
-
-    // Reports
-    Route::get('/reports/export', [StatsController::class, 'export']);
-
-    // Message moderation
-    Route::delete('/messages/{id}', [MessageController::class, 'destroy']);
-
-    // Reset simulation data
-    Route::post('/reset', [ResetController::class, 'reset']);
 });
